@@ -129,6 +129,26 @@ class CatalogueClient {
     CatalogueClient(Catalogue catalogue) throws ParserConfigurationException {
         super();
         opacClient = new HttpClient();
+        String proxyHost=System.getProperty("http.proxyHost");
+        String proxyPortString=System.getProperty("http.proxyPort");
+        if (proxyHost!=null && !proxyHost.isEmpty())
+        {
+        	int proxyPort=80;
+        	if (proxyPortString!=null && !proxyPortString.isEmpty())
+        	{
+        		try
+        		{
+            		proxyPort=Integer.parseInt(proxyPortString);
+        		}
+        		catch (NumberFormatException ex)
+        		{
+        			logger.warn("Java Env param http.proxyPort is not a number: "+proxyPort, ex);
+        		}
+        	}
+            HostConfiguration hostConfiguration=new HostConfiguration();
+            hostConfiguration.setProxy(proxyHost, proxyPort);
+            opacClient.setHostConfiguration(hostConfiguration);
+        }
         this.catalogue = catalogue;
         docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
     }
